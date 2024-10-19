@@ -11,6 +11,8 @@ import Registro from './pages/Registro';
 import UserExperience from './pages/UserExperience';
 import CrearEvaluacion from './pages/CrearEvaluacion';
 import DefaultExperience from './pages/DefaultExperience';
+import Home from './pages/Home';
+import CrearRubrica from './pages/CrearRubrica';
 
 // Define las rutas usando createBrowserRouter
 function App() {
@@ -40,6 +42,14 @@ function App() {
         {
           path: "/DefaultExperience",
           element: <ProtectedRoute><DefaultExperience /></ProtectedRoute>,
+        },
+        {
+          path: "/Home",
+          element: <ProtectedRoute><Home /></ProtectedRoute>,
+        },
+        {
+          path: "/CrearRubrica",
+          element: <ProtectedRoute><CrearRubrica /></ProtectedRoute>,
         },
         // Puedes agregar más rutas si es necesario
       ],

@@ -50,7 +50,7 @@ function Login() {
             alt="Icono" 
             className="w-20 h-auto mb-4 mx-auto" 
           />
-          <h1 className="text-3xl font-bold text-[#275DAC] text-center mb-6">RUBRIC SOFT</h1>
+          <h1 className="text-3xl font-bold text-[#275DAC] text-center mb-6">UXGrade</h1>
 
           {/* Mensaje de error */}
           {errorMessage && (
