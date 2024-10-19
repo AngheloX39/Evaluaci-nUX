@@ -1,86 +1,106 @@
 import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom'; // Importa el hook de navegación
+import { useNavigate, Link } from 'react-router-dom';
 import app from '../firebase';
-import { Link } from 'react-router-dom';
+import logo from '../Images/Fondo.png';  // Imagen de fondo grande
+import icono from '../Images/Icono.png';  // Imagen pequeña
+import { HiMail, HiLockClosed } from 'react-icons/hi';  // Iconos para correo y contraseña
 
 const auth = getAuth(app);
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // Estado para almacenar el mensaje de error
-  const navigate = useNavigate(); // Crea el hook de navegación
+  const [errorMessage, setErrorMessage] = useState(''); 
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrorMessage(''); // Limpiar el mensaje de error antes de intentar iniciar sesión
+    setErrorMessage('');
 
     try {
-      // Inicia sesión con el correo y la contraseña
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       console.log('Usuario ha iniciado sesión con éxito:', user.uid);
-      navigate('/DefaultExperience'); // Redirige a la página de Inicio después de iniciar sesión
+      navigate('/DefaultExperience');
     } catch (error) {
-      console.error("Error al iniciar sesión:", error.message);
-      setErrorMessage('Error al iniciar sesión. Verifica tus credenciales.'); // Establecer el mensaje de error
+      console.error('Error al iniciar sesión:', error.message);
+      setErrorMessage('Error al iniciar sesión. Verifica tus credenciales.');
     }
   };
 
   return (
-    <div className="bg-sky-400 flex justify-center items-center h-screen">
-      <div className="bg-white rounded-lg p-8 shadow-lg w-full max-w-md">
-       
-        <div className="p-4">
-        <h2 className="text-2xl font-semibold mb-4">Evaluacion UX</h2>
-          
+    <div className="flex h-screen">
+      {/* Div izquierdo con la imagen de fondo */}
+      <div className="w-1/2 flex justify-center items-center bg-blue-500">
+        <img 
+          src={logo} 
+          alt="Logo de fondo" 
+          className="w-full h-full object-cover" 
+        />
+      </div>
+
+      {/* Div derecho con el formulario de inicio de sesión */}
+      <div className="w-1/2 flex justify-center items-center bg-white">
+        <div className="p-8">
+          {/* Imagen pequeña arriba del título */}
+          <img 
+            src={icono} 
+            alt="Icono" 
+            className="w-20 h-auto mb-4 mx-auto" 
+          />
+          <h1 className="text-3xl font-bold text-[#275DAC] text-center mb-6">RUBRIC SOFT</h1>
+
+          {/* Mensaje de error */}
           {errorMessage && (
-            <p className="text-red-500 mb-4">{errorMessage}</p> 
+            <p className="text-red-500 mb-4 text-center">{errorMessage}</p>
           )}
 
+          {/* Formulario de inicio de sesión */}
           <form onSubmit={handleLogin}>
-            <p>Correo Electrónico</p>
-            <input
-              type="email"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="border p-2 mb-2 rounded-lg w-full" // Estilo para el input
-            />
-            <p>Contraseña</p>
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="border p-2 mb-4 rounded-lg w-full" // Estilo para el input
-            />
-            <p>
-              <button
-                type="submit"
-                className="bg-sky-400 hover:bg-sky-500 text-black p-2 rounded-lg w-full"
-              >
-                Iniciar Sesión
-              </button>
-            </p>
+            {/* Campo de correo */}
+            <div className="flex items-center border-1 border-[#275DAC] rounded-md mt-4 focus-within:border-4 focus-within:border-[#275DAC] focus-within:shadow-lg">
+              <HiMail className="text-gray-500 mx-3 text-xl" />
+              <input
+                type="email"
+                placeholder="Correo electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="block w-full p-3 outline-none text-lg rounded-md"
+              />
+            </div>
+
+            {/* Campo de contraseña */}
+            <div className="flex items-center border-1 border-[#275DAC] rounded-md mt-4 focus-within:border-4 focus-within:border-[#275DAC] focus-within:shadow-lg">
+              <HiLockClosed className="text-gray-500 mx-3 text-xl" />
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="block w-full p-3 outline-none text-lg rounded-md"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-[#275DAC] text-white py-3 rounded-md mt-6 text-lg"
+            >
+              Iniciar sesión
+            </button>
           </form>
 
-          <div className="mt-4">
-            No tienes cuenta? registrate{" "}
-            <Link to="/Registro" className="text-blue-500 underline">
-              Aquí
-            </Link>
-          </div>
+          {/* Textos centrados */}
+          <p className="text-center mt-4 text-lg">
+            <Link to="/Registro" className="text-[#275DAC]">¿No tienes una cuenta? Regístrate</Link>
+          </p>
         </div>
       </div>
     </div>
-
   );
 }
 
 export default Login;
-
