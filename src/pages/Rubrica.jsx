@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import MenuSuperior from "../components/MenuSuperior2";
 import { db } from "../firebase";
-import { collection, addDoc, AiOutlineDelete, AiOutlineEdit } from "firebase/firestore"; // Importamos los íconos
+import { collection, addDoc } from "firebase/firestore"; // Importamos los íconos
 import { FaTrashAlt } from "react-icons/fa"; // Importar el icono de basura
 
 const Rubrica = () => {
@@ -11,6 +11,8 @@ const Rubrica = () => {
   const navigate = useNavigate();
 
   const [criteriosPorCategoria, setCriteriosPorCategoria] = useState({});
+  const [nuevaCategoria, setNuevaCategoria] = useState(""); // Estado para nueva categoría
+  const [categoriaActual, setCategoriaActual] = useState(""); // Estado para la categoría donde se va a agregar
 
   useEffect(() => {
     if (criteriosSeleccionados && Array.isArray(criteriosSeleccionados)) {
@@ -23,12 +25,20 @@ const Rubrica = () => {
   }, [criteriosSeleccionados]);
 
   const agregarCriterio = (categoria) => {
-    const nuevoCriterio = prompt(`Introduce un nombre para el nuevo criterio en la categoría ${categoria}:`);
-    if (nuevoCriterio) {
+    setCategoriaActual(categoria); // Establecer la categoría actual
+    setNuevaCategoria(""); // Reiniciar el input
+  };
+
+  const handleAgregarNuevaCategoria = () => {
+    if (nuevaCategoria) {
       setCriteriosPorCategoria((prev) => ({
         ...prev,
-        [categoria]: [...prev[categoria], { nombre: nuevoCriterio, preguntas: [] }],
+        [categoriaActual]: [...prev[categoriaActual], { nombre: nuevaCategoria, preguntas: [] }],
       }));
+      setNuevaCategoria(""); // Reiniciar el input
+      setCategoriaActual(""); // Reiniciar la categoría actual
+    } else {
+      alert('Por favor, ingrese un nombre válido para la categoría.');
     }
   };
 
@@ -152,7 +162,7 @@ const Rubrica = () => {
                       <td className="border-2 border-[#275dac] px-4 py-2">
                         {criterio.nombre}
                         <button
-                          className="ml-2 text-red-600"
+                          className="ml-2 text-red-600 bg-white"
                           onClick={() => eliminarCriterio(categoria, criterioIndex)}
                         >
                           <FaTrashAlt />
@@ -165,13 +175,14 @@ const Rubrica = () => {
                             <div key={pregunta.id} className="ml-4 flex justify-between items-center">
                               - {pregunta.texto}
                               <button
-                                className="text-red-600"
+                                className="text-red-600 bg-white"
                                 onClick={() => eliminarPregunta(categoria, criterioIndex, pregunta.id)}
                               >
                                 <FaTrashAlt />
                               </button>
                             </div>
                           ))}
+
                         <div className="flex items-center mt-2">
                           <input
                             type="text"
@@ -194,7 +205,6 @@ const Rubrica = () => {
             </tbody>
           </table>
 
-          {/* Mensaje y botones justo encima de los botones de criterios */}
           <h3 className="text-center text-[#275dac] font-bold text-lg mb-4">SELECCIONA EL CRITERIO DONDE QUIERAS AGREGAR LA CATEGORÍA</h3>
 
           <div className="flex justify-center space-x-4 mt-4">
@@ -212,6 +222,30 @@ const Rubrica = () => {
               </button>
             ))}
           </div>
+
+          {/* Muestra el input para nueva categoría */}
+          {categoriaActual && (
+  <div className="flex justify-between mb-4 pt-4 w-1/3 mx-auto"> {/* Reduce el ancho y centra el contenedor */}
+    <input
+      type="text"
+      value={nuevaCategoria}
+      onChange={(e) => setNuevaCategoria(e.target.value)}
+      placeholder="Añadir nueva categoría..."
+      className="p-2 border rounded w-full mr-2" // Añadir margen a la derecha del input
+    />
+    <button
+      className="w-20 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+      style={{
+        border: "none",
+        boxShadow: "none",
+      }}
+      onClick={handleAgregarNuevaCategoria}
+    >
+      +
+    </button>
+  </div>
+)}
+
 
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
