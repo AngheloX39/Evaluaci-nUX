@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import app from '../firebase';
-import logo from '../Images/Fondo.png';  // Imagen de fondo grande
 import icono from '../Images/Icono.png';  // Imagen pequeña
 import { HiMail, HiLockClosed } from 'react-icons/hi';  // Iconos para correo y contraseña
 
@@ -31,19 +30,13 @@ function Login() {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Div izquierdo con la imagen de fondo */}
-      <div className="w-1/2 flex justify-center items-center bg-blue-500">
-        <img 
-          src={logo} 
-          alt="Logo de fondo" 
-          className="w-full h-full object-cover" 
-        />
-      </div>
-
-      {/* Div derecho con el formulario de inicio de sesión */}
-      <div className="w-1/2 flex justify-center items-center bg-white">
-        <div className="p-8">
+    <div className="flex h-screen bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500" style={{
+      backgroundSize: '200% 200%',
+      animation: 'moveBackground 10s ease infinite'
+    }}>
+      {/* Div derecho con el formulario de inicio de sesión en una tarjeta blanca */}
+      <div className="w-full flex justify-center items-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
           {/* Imagen pequeña arriba del título */}
           <img 
             src={icono} 
@@ -87,7 +80,10 @@ function Login() {
 
             <button
               type="submit"
-              className="w-full bg-[#275DAC] text-white py-3 rounded-md mt-6 text-lg"
+              className="w-full py-3 rounded-md mt-6 text-lg 
+                bg-[#275DAC] 
+                text-white transition-all duration-300 
+                hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500" // Degradado al pasar el cursor
             >
               Iniciar sesión
             </button>
@@ -99,6 +95,21 @@ function Login() {
           </p>
         </div>
       </div>
+
+      {/* Animación del fondo */}
+      <style>{`
+        @keyframes moveBackground {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      `}</style>
     </div>
   );
 }

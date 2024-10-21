@@ -23,13 +23,31 @@ const CrearRubrica = () => {
     }
   };
 
+  // Comprobar si el botón "Siguiente" debe estar habilitado
+  const isNextButtonEnabled = nombreRubrica.trim() !== "" && criteriosSeleccionados.length > 0;
+
   return (
     <div className="min-h-screen flex flex-col">
       <MenuSuperior2 bgColor="white" textColor="#275dac" />
 
-      {/* Ajuste de contenedor para eliminar la barra de desplazamiento */}
-      <div className="flex-grow flex justify-center items-center bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 overflow-hidden">
+      {/* Contenedor principal con fondo degradado y movimiento */}
+      <div
+        className="flex-grow flex justify-center items-center bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500"
+        style={{
+          backgroundSize: '200% 200%',
+          animation: 'moveBackground 10s ease infinite',
+        }}
+      >
         <div className="max-w-4xl w-full py-6 px-6 bg-white rounded-lg shadow-lg"> {/* Ajustamos el padding */}
+          <div className="flex items-center justify-start mb-4">
+            <div className="bg-[#275dac] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl">
+              1
+            </div>
+            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">DALE UN NOMBRE Y SELECCIONA LOS CRITERIOS</h2>
+          </div>
+
+          {/* Reemplazar <hr> con un div para efecto de degradado */}
+          <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-4 mb-8"></div>
           <h2 className="text-xl font-bold text-[#275DAC] mb-2">Nombre de la Rúbrica</h2>
           <input
             type="text"
@@ -39,9 +57,10 @@ const CrearRubrica = () => {
             placeholder="Ingresa el nombre de la rúbrica"
           />
 
-          <hr className="border-t-4 border-[#275dac] my-2" />
+          {/* Otro div para la línea */}
+          <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-2" />
 
-          <h3 className="text-lg font-bold text-[#275DAC] mb-2">Selecciona los Criterios</h3>
+          <h2 className="text-xl font-bold text-[#275DAC] mb-2">Selecciona los Criterios</h2>
           <div className="flex flex-col space-y-4">
             {criterios.map((criterio) => (
               <label key={criterio} className="flex items-center space-x-2">
@@ -58,25 +77,42 @@ const CrearRubrica = () => {
             ))}
           </div>
 
-          <hr className="border-t-4 border-[#275dac] my-3" />
+          {/* Último div para la línea */}
+          <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
           <div className="flex justify-between mt-4"> {/* Margen superior de los botones */}
             <button
               onClick={() => console.log("Volver al inicio")}
-              className="bg-[#275dac] text-white py-2 px-8 rounded-lg shadow transition duration-200 hover:bg-[#b3cef5] hover:text-[#275DAC] focus:outline-none focus:ring-0"
+              className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500" // Efecto degradado en hover
             >
               Inicio
             </button>
 
             <button
               onClick={() => console.log("Crear nueva rúbrica")}
-              className="bg-[#275dac] text-white py-2 px-8 rounded-lg shadow transition duration-200 hover:bg-[#b3cef5] hover:text-[#275DAC] focus:outline-none focus:ring-0"
+              className={`w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500 ${isNextButtonEnabled ? '' : 'opacity-50 cursor-not-allowed'}`} // Efecto degradado en hover
+              disabled={!isNextButtonEnabled} // Habilitar/deshabilitar el botón "Siguiente"
             >
               Siguiente
             </button>
           </div>
         </div>
       </div>
+
+      {/* Animación del fondo */}
+      <style>{`
+        @keyframes moveBackground {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      `}</style>
     </div>
   );
 };

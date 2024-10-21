@@ -19,7 +19,7 @@ const MenuSuperior = ({ bgColor, textColor }) => {
         {/* Botón de cerrar sesión más compacto */}
         <button
           className="px-3 py-1 hover:bg-gray-200 rounded-md shadow-md"
-          style={{ backgroundColor:  bgColor, color:textColor }}
+          style={{ backgroundColor:textColor, color:bgColor }}
           onClick={handleLogout} // Lógica para cerrar sesión
         >
           Cerrar sesión

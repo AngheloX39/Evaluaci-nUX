@@ -108,7 +108,12 @@ const Rubrica = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500">
+    <div className="min-h-screen bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500"
+    style={{
+      backgroundSize: '200% 200%',
+      animation: 'moveBackground 10s ease infinite',
+    }}
+    >
       <MenuSuperior bgColor="white" textColor="#275dac" />
 
       <div className="flex justify-center items-center pt-12 pb-12">
@@ -117,10 +122,10 @@ const Rubrica = () => {
             <div className="bg-[#275dac] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl">
               2
             </div>
-            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">Termina tu Rubrica</h2>
+            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">TERMINA DE CREAR TU RÚBRICA</h2>
           </div>
 
-          <hr className="border-t-4 border-[#275dac] my-4 mb-8" />
+          <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
           {/* Tabla principal */}
           <div className="overflow-x-auto">
@@ -235,16 +240,32 @@ const Rubrica = () => {
             </table>
           </div>
 
-          <hr className="border-t-4 border-[#275dac] my-4 mb-8" />
+          <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
           {/* Botones de navegación */}
           <div className="flex justify-between mt-8">
-            <button onClick={handleAtras} className="bg-[#275dac] text-white px-4 py-2 rounded">Atrás</button>
-            <button onClick={handleSiguiente} className="bg-[#275dac] text-white px-4 py-2 rounded">Siguiente</button>
+            <button onClick={handleAtras} className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500">Atrás</button>
+            <button onClick={handleSiguiente} className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500">Siguiente</button>
           </div>
         </div>
       </div>
+     {/* Animación del fondo */}
+     <style>{`
+        @keyframes moveBackground {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      `}</style>
     </div>
+
+    
   );
 };
 
