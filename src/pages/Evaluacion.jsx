@@ -1,76 +1,195 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas"; // Importar html2canvas
 import MenuSuperior from "../components/MenuSuperior2"; // Asegúrate de que la ruta es correcta
+import { useLocation, useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore"; // Importar Firebase
+import { db } from "../firebase";
+import { Link } from 'react-router-dom';
 
 const Evaluacion = () => {
-  // Datos estáticos
-  const [categoriasPorCriterio] = useState({
-    Usabilidad: [
-      { nombre: "Facilidad de aprendizaje", preguntas: ["¿Es fácil de aprender?", "¿La interfaz es intuitiva?"] },
-      { nombre: "Retroalimentación del sistema", preguntas: ["¿La retroalimentación es clara?", "¿Se proporcionan mensajes de error?"] },
-    ],
-    Accesibilidad: [
-      { nombre: "Interfaz de usuario", preguntas: ["¿Es accesible para personas con discapacidad?", "¿Se puede navegar usando el teclado?"] },
-      { nombre: "Documentación y ayuda", preguntas: ["¿La documentación es clara y accesible?", "¿Existen tutoriales disponibles?"] },
-    ],
-    Simplicidad: [
-      { nombre: "Reducción de complejidad", preguntas: ["¿El sistema es fácil de usar?", "¿Se evitan características innecesarias?"] },
-    ],
-    Consistencia: [
-      { nombre: "Consistencia visual", preguntas: ["¿Los colores y fuentes son coherentes?", "¿Se mantienen los mismos patrones de diseño?"] },
-    ],
-    "Centrado en el Usuario": [
-      { nombre: "Empatía", preguntas: ["¿Se consideran las necesidades del usuario?", "¿El diseño es inclusivo?"] },
-    ],
-  });
-
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [rubrica, setRubrica] = useState(null); // Estado para almacenar la rúbrica
+  const [criteriosPorCategoria, setCriteriosPorCategoria] = useState({}); // Estado para criterios por categoría
   const [puntajesSeleccionados, setPuntajesSeleccionados] = useState({});
-  const [evaluarHabilitado, setEvaluarHabilitado] = useState(false);
+  const [mostrarPuntuacion, setMostrarPuntuacion] = useState(false); // Estado para mostrar la puntuación
+  const [puntuacionTotal, setPuntuacionTotal] = useState(0); // Estado para la puntuación total
+  const [mensajePuntuacion, setMensajePuntuacion] = useState(""); // Estado para el mensaje de puntuación
+  const [colorCuadroPuntuacion, setColorCuadroPuntuacion] = useState(""); // Estado para el color del cuadro
 
-  const handleEvaluate = () => {
-    setEvaluarHabilitado(true);
-  };
+  const rubricaId = location.state?.rubricaId;
 
+  useEffect(() => {
+    const cargarRubrica = async () => {
+      if (!rubricaId) {
+        console.error("No se proporcionó el ID de la rúbrica.");
+        return;
+      }
+
+      try {
+        const rubricaRef = doc(db, "EvUser", rubricaId);
+        const rubricaSnapshot = await getDoc(rubricaRef);
+
+        if (rubricaSnapshot.exists()) {
+          const rubricaData = rubricaSnapshot.data();
+          setRubrica(rubricaData);
+          console.log("Datos de la rúbrica:", rubricaData);
+
+          // Cargar detalles de criterios
+          await cargarDetallesCriterios(rubricaData.criterios);
+        } else {
+          console.log("No se encontró la rúbrica.");
+        }
+      } catch (error) {
+        console.error("Error al cargar la rúbrica:", error);
+      }
+    };
+
+    const cargarDetallesCriterios = async (criteriosIds) => {
+      if (!Array.isArray(criteriosIds) || criteriosIds.length === 0) {
+        console.log("No hay criterios para cargar.");
+        return;
+      }
+
+      try {
+        const criteriosPromesas = criteriosIds.map(async (id) => {
+          const criterioRef = doc(db, "criterio", id);
+          const criterioSnapshot = await getDoc(criterioRef);
+
+          if (criterioSnapshot.exists()) {
+            return criterioSnapshot.data(); // Retorna los detalles del criterio
+          } else {
+            console.log(`No se encontró el criterio con ID: ${id}`);
+            return null;
+          }
+        });
+
+        const criteriosResult = await Promise.all(criteriosPromesas);
+        setCriteriosPorCategoria(agruparCriteriosPorCategoria(criteriosResult));
+      } catch (error) {
+        console.error("Error al cargar los detalles de los criterios:", error);
+      }
+    };
+
+    const agruparCriteriosPorCategoria = (criterios) => {
+      return criterios.reduce((acc, criterio) => {
+        if (criterio) {
+          const { categoria } = criterio;
+          if (!acc[categoria]) {
+            acc[categoria] = [];
+          }
+          acc[categoria].push({ ...criterio, preguntas: criterio.preguntas || [] });
+        }
+        return acc;
+      }, {});
+    };
+
+    cargarRubrica();
+  }, [rubricaId]);
+
+  // Verifica si los datos se han cargado
+  if (!rubrica) {
+    return <div>Cargando...</div>; // Mensaje de carga
+  }
+
+  // Habilitar evaluación cuando sea necesario
   const handlePuntajeSeleccionado = (criterio, index, puntaje) => {
+    // Actualizar el puntaje seleccionado
     setPuntajesSeleccionados((prev) => ({
       ...prev,
       [`${criterio}-${index}`]: puntaje,
     }));
+
+    // Calcular la nueva puntuación total
+    calcularPuntuacionTotal({
+      ...puntajesSeleccionados,
+      [`${criterio}-${index}`]: puntaje,
+    });
   };
 
-  const todosLosPuntajesSeleccionados = Object.keys(categoriasPorCriterio).flatMap((criterio) => {
-    return categoriasPorCriterio[criterio].map((_, index) => {
-      return puntajesSeleccionados[`${criterio}-${index}`] !== undefined;
-    });
-  }).every(Boolean);
+  // Calcular puntuación total
+  const calcularPuntuacionTotal = (nuevosPuntajesSeleccionados) => {
+    const totalPuntaje = Object.values(nuevosPuntajesSeleccionados).reduce((total, puntaje) => {
+      return total + puntaje; // Sumar los puntajes
+    }, 0);
 
+    const totalCriterios = Object.keys(nuevosPuntajesSeleccionados).length;
+    const puntuacionFinal = totalCriterios > 0 ? Math.round((totalPuntaje / (totalCriterios * 5)) * 100) : 0;
+
+    setPuntuacionTotal(puntuacionFinal);
+    setMostrarPuntuacion(true); // Mostrar cuadro de puntuación
+
+    // Determinar el mensaje y el color del cuadro de puntuación
+    determinarMensajeYColor(puntuacionFinal);
+  };
+
+  // Función para determinar el mensaje y el color del cuadro de puntuación
+  const determinarMensajeYColor = (puntuacion) => {
+    let mensaje = "";
+    let color = "";
+
+    if (puntuacion < 20) {
+      mensaje = "Mal diseño UX";
+      color = "bg-red-300"; // Rojo
+    } else if (puntuacion < 40) {
+      mensaje = "Diseño UX deficiente";
+      color = "bg-orange-300"; // Naranja
+    } else if (puntuacion < 60) {
+      mensaje = "Diseño UX regular";
+      color = "bg-yellow-300"; // Amarillo
+    } else if (puntuacion < 80) {
+      mensaje = "Diseño UX bueno";
+      color = "bg-blue-200"; // Azul
+    } else if (puntuacion < 99) {
+      mensaje = "Diseño UX Muy bueno";
+      color = "bg-blue-400"; // Azul
+    } else {
+      mensaje = "Diseño UX perfecto";
+      color = "bg-green-300"; // Verde
+    }
+
+    setMensajePuntuacion(mensaje);
+    setColorCuadroPuntuacion(color);
+  };
+
+  // Descargar la tabla como PDF
   const handleDownloadPDF = () => {
-    const input = document.getElementById("tabla-evaluacion"); // Obtener la tabla por su ID
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      const imgWidth = 190; // Ancho de la imagen en el PDF
-      const pageHeight = pdf.internal.pageSize.height;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
+    const input = document.getElementById("tabla-evaluacion");
+    const inputPuntuacion = document.getElementById("cuadro-puntuacion"); // Obtener el cuadro de puntuación
+    const inputPuntuacionTexto = document.getElementById("mensaje-puntuacion"); // Obtener el mensaje de puntuación
 
+    Promise.all([
+      html2canvas(input, { scale: 2 }),
+      html2canvas(inputPuntuacion, { scale: 2 }),
+    ]).then(([canvasTabla, canvasPuntuacion]) => {
+      const imgDataTabla = canvasTabla.toDataURL("image/png");
+      const imgDataPuntuacion = canvasPuntuacion.toDataURL("image/png");
+
+      const pdf = new jsPDF();
+      const imgWidth = 190;
+      const pageHeight = pdf.internal.pageSize.height;
+      const imgHeightTabla = (canvasTabla.height * imgWidth) / canvasTabla.width;
+      const imgHeightPuntuacion = (canvasPuntuacion.height * imgWidth) / canvasPuntuacion.width;
+
+      let heightLeft = imgHeightTabla + imgHeightPuntuacion;
       let position = 0;
 
-      // Agregar la imagen al PDF
-      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Agregar tabla al PDF
+      pdf.addImage(imgDataTabla, "PNG", 10, position, imgWidth, imgHeightTabla);
+      position += imgHeightTabla;
 
-      // Si la imagen es más alta que la página, agregar nuevas páginas
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      // Agregar cuadro de puntuación al PDF
+      pdf.addImage(imgDataPuntuacion, "PNG", 10, position, imgWidth, imgHeightPuntuacion);
 
       pdf.save("evaluacion.pdf");
     });
+  };
+
+  // Función para finalizar la evaluación
+  const finalizarEvaluacion = () => {
+    handleDownloadPDF(); // Descargar el PDF
+    navigate("/Home"); // Redirigir a la página /Home
   };
 
   return (
@@ -84,96 +203,96 @@ const Evaluacion = () => {
 
       <div className="flex justify-center items-center pt-12 pb-12">
         <div className="max-w-7xl w-full p-12 bg-white rounded-lg shadow-lg">
-          <div className="flex items-center justify-start mb-4">
-            <div className="bg-[#275dac] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl">
-              3
-            </div>
-            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">REALIZA TU EVALUACIÓN</h2>
+          <div className="flex items-center mb-6">
+            <h1 className="ml-4 text-3xl font-bold">Evaluación</h1>
           </div>
-
-          <hr className="border-t-4 border-[#275dac] my-4 mb-8" />
-
-          {/* Botones para descargar PDF y evaluar */}
-          <div className="flex justify-between mb-4">
+          {/* Botones de evaluación y descarga */}
+          <div className="flex justify-between mt-4 p-3">
+            {/* Botón para descargar PDF */}
             <button
               onClick={handleDownloadPDF}
-              className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+              className={`w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500`}
             >
-              Descargar PDF
+              Imprimir PDF
             </button>
 
-            <button
-              onClick={handleEvaluate}
-              className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
-            >
-              Evaluar 
-            </button>
+            {!mostrarPuntuacion && (
+              <button
+                onClick={() => setMostrarPuntuacion(true)}
+                className={`w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500`}
+              >
+                Evaluar
+              </button>
+            )}
           </div>
 
-          {/* Tabla principal */}
+
           <div className="overflow-x-auto">
-            <table id="tabla-evaluacion" className="min-w-full table-auto border-collapse" style={{ tableLayout: "fixed" }}>
-              {/* Encabezado */}
-              <thead className="bg-[#275dac] text-white">
+            <table id="tabla-evaluacion" className="min-w-full border-collapse border border-[#275dac]">
+              <thead>
                 <tr>
-                  <th className="border px-4 py-2">CRITERIOS</th>
-                  <th className="border px-4 py-2">CATEGORIAS</th>
-                  <th className="border px-4 py-2">PREGUNTAS DE AYUDA</th>
-                  <th className="border px-4 py-2" style={{ width: "100px" }}>EXCELENTE</th>
-                  <th className="border px-4 py-2" style={{ width: "100px" }}>BUENO</th>
-                  <th className="border px-4 py-2" style={{ width: "100px" }}>REGULAR</th>
-                  <th className="border px-4 py-2" style={{ width: "100px" }}>SUFICIENTE</th>
-                  <th className="border px-4 py-2" style={{ width: "100px" }}>MALO</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">Categoría</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">Criterio</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">Preguntas</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">EXCELENTE</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">BUENO</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">REGULAR</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">SUFICIENTE</th>
+                  <th className="border-2 border-[#275dac] px-4 py-2">MALO</th>
                 </tr>
               </thead>
-
-              {/* Cuerpo de la tabla */}
               <tbody>
-                {Object.entries(categoriasPorCriterio).flatMap(([criterio, categorias]) => {
-                  return categorias.map((categoria, index) => (
-                    <tr key={`${criterio}-${index}`}>
-                      {/* Columna de criterios */}
-                      <td className="border-2 border-[#275dac] px-4 py-2 w-1/4">
-                        {index === 0 ? criterio : ""}
-                      </td>
-
-                      {/* Columna de categorías */}
-                      <td className="border-2 border-[#275dac] px-4 py-2 w-1/4">
-                        {categoria.nombre}
-                      </td>
-
-                      {/* Columna de preguntas de ayuda */}
-                      <td className="border-2 border-[#275dac] px-4 py-2 w-1/2">
-                        {categoria.preguntas.map((pregunta, preguntaIndex) => (
-                          <div key={preguntaIndex} className="flex items-center">
-                            <span className="mr-2">{pregunta}</span>
-                          </div>
-                        ))}
-                      </td>
-
-                      {/* Columnas de puntajes */}
-                      {[5, 4, 3, 2, 1].map((puntaje) => (
-                        <td
-                          key={puntaje}
-                          className={`border-2 border-[#275dac] px-4 py-2 text-center text-2xl cursor-pointer 
-                            ${puntajesSeleccionados[`${criterio}-${index}`] === puntaje ? "bg-blue-200" : ""}`}
-                          onClick={evaluarHabilitado ? () => handlePuntajeSeleccionado(criterio, index, puntaje) : undefined} // Manejar la selección de puntaje solo si está habilitado
-                        >
-                          {puntaje}
-                        </td>
-                      ))}
+                {Object.entries(criteriosPorCategoria).map(([categoria, criterios]) => (
+                  criterios.length === 0 ? (
+                    <tr key={categoria}>
+                      <td className="border-2 border-[#275dac] px-4 py-2" colSpan="8">No hay criterios en esta categoría.</td>
                     </tr>
-                  ));
-                })}
+                  ) : (
+                    criterios.map((criterio, criterioIndex) => (
+                      <tr key={criterio.id || criterioIndex}>
+                        <td className="border-2 border-[#275dac] px-4 py-2">{categoria}</td>
+                        <td className="border-2 border-[#275dac] px-4 py-2">{criterio.nombre}</td>
+                        <td className="border-2 border-[#275dac] px-4 py-2">
+                          {criterio.preguntas.map((pregunta) => (
+                            <div key={pregunta.id} className="flex justify-between items-center">
+                              - {pregunta.texto}
+                            </div>
+                          ))}
+                        </td>
+                        {/* Espacios para calificar */}
+                        {[5, 4, 3, 2, 1].map((puntaje) => (
+                          <td key={puntaje} className="border-2 border-[#275dac] px-4 py-2">
+                            <button
+                              className={`p-1 text-black ${puntajesSeleccionados[`${criterio.nombre}-${criterioIndex}`] === puntaje ? 'bg-blue-300' : 'bg-white'}`}
+                              onClick={() => handlePuntajeSeleccionado(criterio.nombre, criterioIndex, puntaje)}
+                            >
+                              {puntaje}
+                            </button>
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  )
+                ))}
               </tbody>
             </table>
           </div>
 
+          {/* Mostrar cuadro de puntuación si es necesario */}
+          {mostrarPuntuacion && (
+            <div id="cuadro-puntuacion" className={`mt-4 p-4 border-2 border-[#275dac] rounded-md ${colorCuadroPuntuacion}`}>
+              <h3 className="text-lg font-semibold">Puntuación Total: {puntuacionTotal}</h3>
+              <p id="mensaje-puntuacion" className="mt-2">{mensajePuntuacion}</p>
+            </div>
+          )}
+
+
+
           <div className="flex justify-center mt-4">
             <button
-              disabled={!todosLosPuntajesSeleccionados} // Deshabilitar si no todos los puntajes están seleccionados
-              onClick={handleDownloadPDF}
-              className={`w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 ${!todosLosPuntajesSeleccionados ? "bg-gray-400 cursor-not-allowed" : "hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"}`}
+              disabled={Object.keys(puntajesSeleccionados).length === 0} // Deshabilitar si no hay puntajes seleccionados
+              onClick={finalizarEvaluacion}
+              className={`w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 ${Object.keys(puntajesSeleccionados).length === 0 ? "bg-gray-400 cursor-not-allowed" : "hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"}`}
             >
               Finalizar Evaluación
             </button>
@@ -183,8 +302,9 @@ const Evaluacion = () => {
 
           {/* Botones de navegación */}
           <div className="flex justify-between mt-8">
-            <button onClick={() => console.log("Navegando a la sección anterior...")} className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500">Atrás</button>
-            <button onClick={() => console.log("Navegando a la siguiente sección...")} className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500">Siguiente</button>
+            <Link to="/Home" className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500">
+            <button onClick={() => console.log("Navegando a la sección anterior...")} className="w-1/4 py-2 rounded-md text-lg bg-transparent text-white ">Atrás</button>
+            </Link>
           </div>
         </div>
       </div>

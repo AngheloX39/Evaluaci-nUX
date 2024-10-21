@@ -5,6 +5,7 @@ import { doc, getDoc, collection, updateDoc, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { FaTrashAlt } from "react-icons/fa"; // Importar el icono de basura
 
+
 const EditarRubrica = () => {
   const location = useLocation();
   const navigate = useNavigate();

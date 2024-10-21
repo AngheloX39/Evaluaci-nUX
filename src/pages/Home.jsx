@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db } from '../firebase'; 
+import { db } from '../firebase';
 import { HiDownload, HiTrash, HiPencil, HiClipboardCheck } from "react-icons/hi";
 import MenuSuperior from "../components/MenuSuperior";
 import { Link, useNavigate } from 'react-router-dom';
@@ -76,33 +76,39 @@ const Home = () => {
     console.log("Descargar PDF de la evaluación con ID:", id);
   };
 
-  const handleEvaluate = (id) => {
-    console.log("Realizar evaluación con ID:", id);
+  const handleEvaluate = (evaluacion) => {
+    navigate("/Evaluacion", {
+      state: {
+        rubricaId: evaluacion.id,
+        nombreRubrica: evaluacion.nombreRubrica,
+        criteriosSeleccionados: evaluacion.criterios // Pasamos los criterios seleccionados
+      }
+    });
   };
 
+
   return (
-    <div className="bg-white min-h-screen flex flex-col"> {/* Aquí el ajuste clave */}
+    <div className="bg-white min-h-screen flex flex-col">
       <MenuSuperior bgColor="#275dac" textColor="#ffffff" />
 
       <div className="flex justify-end mt-4 mr-10">
-      
-      <button
-        className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 mr-4"
-        style={{
-        backgroundImage: "linear-gradient(to right, #1e40af, #3b82f6, #2dd4bf)", // Azul oscuro a teal
-        color: "#ffffff",
-        border: "none", // Remove any borders
-        boxShadow: "none" // Remove any shadow
-        }}
-        onClick={() => console.log("Ir a Evaluaciones")}
-      >
-           Evaluaciones
-      </button>
+        <button
+          className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 mr-4"
+          style={{
+            backgroundImage: "linear-gradient(to right, #1e40af, #3b82f6, #2dd4bf)",
+            color: "#ffffff",
+            border: "none",
+            boxShadow: "none"
+          }}
+          onClick={() => console.log("Ir a Evaluaciones")}
+        >
+          Evaluaciones
+        </button>
 
         <Link to="/CrearRubrica">
           <button
             className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
-            style={{ backgroundColor: "#275DAC", color: "#ffffff", border:"none" }}
+            style={{ backgroundColor: "#275DAC", color: "#ffffff", border: "none" }}
             onClick={() => console.log("Crear nueva rúbrica")}
           >
             Crear Rúbrica
@@ -110,7 +116,6 @@ const Home = () => {
         </Link>
       </div>
 
-      {/* Mostrar las evaluaciones cargadas de Firebase */}
       <div className="flex flex-wrap justify-start mt-4 ml-10">
         {evaluaciones.length === 0 ? (
           <p className="text-gray-500">No hay evaluaciones disponibles.</p>
@@ -127,7 +132,7 @@ const Home = () => {
                       ? evaluacion.timestamp.toDate().toLocaleDateString()
                       : evaluacion.timestamp)
                     : "Fecha no disponible"
-                  }`}
+                    }`}
                 </p>
               </div>
 
@@ -149,19 +154,11 @@ const Home = () => {
                 </button>
 
                 <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#2DCA8C] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-green-600 hover:to-green-400"
-                  onClick={() => handleDownload(evaluacion.id)}
-                >
-                  <HiDownload className="text-lg" />
-                  <span className="text-xs">Descargar</span>
-                </button>
-
-                <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#FBB13C] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-yellow-600 hover:to-yellow-400"
-                  onClick={() => handleEvaluate(evaluacion.id)}
+                  className="flex flex-col items-center justify-center w-1/2 bg-[#60ee3d] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-green-200 hover:to-green-400"
+                  onClick={() => handleEvaluate(evaluacion)} // Mantiene la funcionalidad de Evaluar
                 >
                   <HiClipboardCheck className="text-lg" />
-                  <span className="text-xs">Evaluar</span>
+                  <span className="text-xs">Visualizar</span> {/* Cambiado a "Ver" */}
                 </button>
               </div>
             </div>
@@ -169,7 +166,6 @@ const Home = () => {
         )}
       </div>
 
-      {/* Modal de Confirmación de Eliminación */}
       {eliminacionPendiente && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -193,7 +189,6 @@ const Home = () => {
         </div>
       )}
 
-      {/* Notificación */}
       {mostrarNotificacion && (
         <div className="fixed bottom-4 right-4 bg-white text-black p-4 rounded-lg shadow-lg">
           {mensaje}
