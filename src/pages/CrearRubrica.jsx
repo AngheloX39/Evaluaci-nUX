@@ -96,12 +96,20 @@ const CrearRubrica = () => {
             <button
               onClick={() => navigate("/")}
               className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500" // Efecto degradado en hover
-            >
+              style={{
+                border: "none", // Remove any borders
+                boxShadow: "none" // Remove any shadow
+                }}
+           >
               Inicio
             </button>
             <button
               onClick={handleNext}
               className={`w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500 `} // Efecto degradado en hover
+              style={{
+                border: "none", // Remove any borders
+                boxShadow: "none" // Remove any shadow
+                }}
             >
               Siguiente
             </button>

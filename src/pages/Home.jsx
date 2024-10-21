@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db } from '../firebase'; // Asegúrate de tener la ruta correcta para importar la configuración de Firebase
+import { db } from '../firebase'; 
 import { HiDownload, HiTrash, HiPencil, HiClipboardCheck } from "react-icons/hi";
 import MenuSuperior from "../components/MenuSuperior";
-import { Link, useNavigate } from 'react-router-dom'; // Importa useNavigate
-import { Timestamp } from "firebase/firestore"; // Importa Timestamp
+import { Link, useNavigate } from 'react-router-dom';
+import { Timestamp } from "firebase/firestore";
 
 const Home = () => {
-  const [evaluaciones, setEvaluaciones] = useState([]); // Estado para almacenar las evaluaciones
-  const [eliminacionPendiente, setEliminacionPendiente] = useState(null); // Estado para la evaluación que se va a eliminar
-  const [mensaje, setMensaje] = useState(""); // Estado para los mensajes de notificación
-  const [mostrarNotificacion, setMostrarNotificacion] = useState(false); // Estado para mostrar la notificación
+  const [evaluaciones, setEvaluaciones] = useState([]);
+  const [eliminacionPendiente, setEliminacionPendiente] = useState(null);
+  const [mensaje, setMensaje] = useState("");
+  const [mostrarNotificacion, setMostrarNotificacion] = useState(false);
 
-  const navigate = useNavigate(); // Inicializa navigate
+  const navigate = useNavigate();
 
-  // Función para obtener las evaluaciones de Firebase
   const obtenerEvaluaciones = async () => {
     try {
       const evaluacionesSnapshot = await getDocs(collection(db, "EvUser"));
@@ -22,7 +21,7 @@ const Home = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setEvaluaciones(evaluacionesList); // Guardar las evaluaciones en el estado
+      setEvaluaciones(evaluacionesList);
     } catch (error) {
       setMensaje(`Error al cargar evaluaciones: ${error.message}`);
       setMostrarNotificacion(true);
@@ -30,51 +29,45 @@ const Home = () => {
   };
 
   useEffect(() => {
-    obtenerEvaluaciones(); // Cargar evaluaciones al montar el componente
+    obtenerEvaluaciones();
   }, []);
 
-  // Función para confirmar la eliminación de una evaluación
   const confirmarEliminacion = (evaluacion) => {
-    setEliminacionPendiente(evaluacion); // Establecer la evaluación a eliminar
+    setEliminacionPendiente(evaluacion);
   };
 
-  // Función para cancelar la eliminación
   const cancelarEliminacion = () => {
-    setEliminacionPendiente(null); // Limpiar el estado
+    setEliminacionPendiente(null);
   };
 
-  // Función para eliminar una evaluación de Firebase
   const handleDelete = async () => {
     if (!eliminacionPendiente) return;
 
     try {
-      await deleteDoc(doc(db, "EvUser", eliminacionPendiente.id)); // Eliminar el documento de Firebase
-      setEvaluaciones(prev => prev.filter(evaluacion => evaluacion.id !== eliminacionPendiente.id)); // Actualizar el estado
+      await deleteDoc(doc(db, "EvUser", eliminacionPendiente.id));
+      setEvaluaciones(prev => prev.filter(evaluacion => evaluacion.id !== eliminacionPendiente.id));
       setMensaje(`La evaluación "${eliminacionPendiente.nombreRubrica}" ha sido eliminada correctamente.`);
     } catch (error) {
       setMensaje(`Error al eliminar la evaluación: ${error.message}`);
     } finally {
-      setEliminacionPendiente(null); // Limpiar la evaluación pendiente
-      setMostrarNotificacion(true); // Mostrar la notificación
+      setEliminacionPendiente(null);
+      setMostrarNotificacion(true);
     }
   };
 
-  // Cerrar la notificación después de unos segundos
   useEffect(() => {
     if (mostrarNotificacion) {
       const timer = setTimeout(() => setMostrarNotificacion(false), 3000);
-      return () => clearTimeout(timer); // Limpiar el temporizador
+      return () => clearTimeout(timer);
     }
   }, [mostrarNotificacion]);
 
-  // Función para navegar a la página de edición
   const handleEdit = (evaluacion) => {
-    console.log("Navegando a EditarRubrica con:", evaluacion); // Agrega este log
     navigate("/EditarRubrica", {
       state: {
         rubricaId: evaluacion.id,
         nombreRubrica: evaluacion.nombreRubrica,
-        criteriosSeleccionados: evaluacion.criterios // Asegúrate de enviar los criterios seleccionados
+        criteriosSeleccionados: evaluacion.criterios
       }
     });
   };
@@ -88,21 +81,28 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-white h-screen flex flex-col">
+    <div className="bg-white min-h-screen flex flex-col"> {/* Aquí el ajuste clave */}
       <MenuSuperior bgColor="#275dac" textColor="#ffffff" />
 
       <div className="flex justify-end mt-4 mr-10">
-        <button
-          className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 mr-4"
-          style={{ backgroundColor: "#275DAC", color: "#ffffff" }}
-          onClick={() => console.log("Ir a Evaluaciones")}
-        >
-          Evaluaciones
-        </button>
+      
+      <button
+        className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 mr-4"
+        style={{
+        backgroundImage: "linear-gradient(to right, #1e40af, #3b82f6, #2dd4bf)", // Azul oscuro a teal
+        color: "#ffffff",
+        border: "none", // Remove any borders
+        boxShadow: "none" // Remove any shadow
+        }}
+        onClick={() => console.log("Ir a Evaluaciones")}
+      >
+           Evaluaciones
+      </button>
+
         <Link to="/CrearRubrica">
           <button
-            className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500" // Agregar efecto hover aquí
-            style={{ backgroundColor: "#275DAC", color: "#ffffff" }}
+            className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+            style={{ backgroundColor: "#275DAC", color: "#ffffff", border:"none" }}
             onClick={() => console.log("Crear nueva rúbrica")}
           >
             Crear Rúbrica
@@ -118,11 +118,9 @@ const Home = () => {
           evaluaciones.map((evaluacion) => (
             <div key={evaluacion.id} className="bg-white shadow-lg rounded-lg w-80 border-2 border-gray-300 overflow-hidden m-4">
               <div className="p-4">
-                {/* Nombre de la evaluación */}
                 <h2 className="text-xl font-bold mb-2 text-[#275DAC] text-center">
                   {evaluacion.nombreRubrica}
                 </h2>
-                {/* Fecha de creación */}
                 <p className="text-gray-500 text-center">
                   {`Creada el: ${evaluacion.timestamp
                     ? (evaluacion.timestamp instanceof Timestamp
@@ -144,7 +142,7 @@ const Home = () => {
 
                 <button
                   className="flex flex-col items-center justify-center w-1/4 bg-[#275DAC] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:to-blue-500"
-                  onClick={() => handleEdit(evaluacion)} // Modificado para llamar a handleEdit
+                  onClick={() => handleEdit(evaluacion)}
                 >
                   <HiPencil className="text-lg" />
                   <span className="text-xs">Editar</span>
@@ -197,7 +195,7 @@ const Home = () => {
 
       {/* Notificación */}
       {mostrarNotificacion && (
-        <div className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-lg shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-white text-black p-4 rounded-lg shadow-lg">
           {mensaje}
         </div>
       )}
