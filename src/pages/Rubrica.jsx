@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import MenuSuperior from "../components/MenuSuperior2";
 import { db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, AiOutlineDelete, AiOutlineEdit } from "firebase/firestore"; // Importamos los íconos
 import { FaTrashAlt } from "react-icons/fa"; // Importar el icono de basura
 
 const Rubrica = () => {
@@ -115,21 +115,27 @@ const Rubrica = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500">
+    <div className="min-h-screen bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500"
+    style={{
+      backgroundSize: '200% 200%',
+      animation: 'moveBackground 10s ease infinite',
+    }}
+    >
       <MenuSuperior bgColor="white" textColor="#275dac" />
 
       <div className="flex justify-center items-center pt-12 pb-12">
-        <div className="max-w-6xl w-full p-12 bg-white rounded-lg shadow-lg">
+        <div className="max-w-7xl w-full p-12 bg-white rounded-lg shadow-lg">
           <div className="flex items-center justify-start mb-4">
             <div className="bg-[#275dac] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl">
-              3
+              2
             </div>
+            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">TERMINA DE CREAR TU RÚBRICA</h2>
             <h2 className="ml-4 text-[#275dac] font-bold text-2xl">
               Elige las preguntas de ayuda para la rúbrica: {nombreRubrica}
             </h2>
           </div>
 
-          <hr className="border-t-4 border-[#275dac] my-4 mb-8" />
+          <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
           {/* Tabla para mostrar criterios y preguntas */}
           <table className="min-w-full table-auto border-collapse rounded-lg mx-0 mb-4">
@@ -217,7 +223,7 @@ const Rubrica = () => {
             ))}
           </div>
 
-          <hr className="border-t-4 border-[#275dac] my-4 mt-8" />
+          <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
           {/* Botones de navegación */}
           <div className="flex justify-between mt-8">
@@ -237,7 +243,23 @@ const Rubrica = () => {
           </div>
         </div>
       </div>
+     {/* Animación del fondo */}
+     <style>{`
+        @keyframes moveBackground {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      `}</style>
     </div>
+
+    
   );
 };
 

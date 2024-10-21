@@ -15,6 +15,7 @@ import Home from './pages/Home';
 import CrearRubrica from './pages/CrearRubrica';
 import Rubrica from './pages/Rubrica';
 import EditarRubrica from './pages/EditarRubrica';
+import Evaluacion from './pages/Evaluacion';
 
 // Define las rutas usando createBrowserRouter
 function App() {
@@ -60,6 +61,10 @@ function App() {
         {
           path: "/EditarRubrica",
           element: <ProtectedRoute><EditarRubrica /></ProtectedRoute>,
+        },
+        {
+          path: "/Evaluacion",
+          element: <ProtectedRoute><Evaluacion /></ProtectedRoute>,
         },
         // Puedes agregar más rutas si es necesario
       ],

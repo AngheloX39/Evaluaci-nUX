@@ -88,12 +88,12 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <div className="bg-white h-screen flex flex-col">
       <MenuSuperior bgColor="#275dac" textColor="#ffffff" />
 
       <div className="flex justify-end mt-4 mr-10">
         <button
-          className="py-2 px-4 rounded-md mr-4"
+          className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 mr-4"
           style={{ backgroundColor: "#275DAC", color: "#ffffff" }}
           onClick={() => console.log("Ir a Evaluaciones")}
         >
@@ -101,7 +101,7 @@ const Home = () => {
         </button>
         <Link to="/CrearRubrica">
           <button
-            className="py-2 px-4 rounded-md"
+            className="w-40 py-2 rounded-md mt-2 text-base transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500" // Agregar efecto hover aquí
             style={{ backgroundColor: "#275DAC", color: "#ffffff" }}
             onClick={() => console.log("Crear nueva rúbrica")}
           >
@@ -135,7 +135,7 @@ const Home = () => {
 
               <div className="flex">
                 <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#FF3E3E] text-white py-3"
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#FF3E3E] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-400"
                   onClick={() => confirmarEliminacion(evaluacion)}
                 >
                   <HiTrash className="text-lg" />
@@ -143,7 +143,7 @@ const Home = () => {
                 </button>
 
                 <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#275DAC] text-white py-3"
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#275DAC] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:to-blue-500"
                   onClick={() => handleEdit(evaluacion)} // Modificado para llamar a handleEdit
                 >
                   <HiPencil className="text-lg" />
@@ -151,7 +151,7 @@ const Home = () => {
                 </button>
 
                 <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#2DCA8C] text-white py-3"
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#2DCA8C] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-green-600 hover:to-green-400"
                   onClick={() => handleDownload(evaluacion.id)}
                 >
                   <HiDownload className="text-lg" />
@@ -159,7 +159,7 @@ const Home = () => {
                 </button>
 
                 <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#FBB13C] text-white py-3"
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#FBB13C] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-yellow-600 hover:to-yellow-400"
                   onClick={() => handleEvaluate(evaluacion.id)}
                 >
                   <HiClipboardCheck className="text-lg" />
