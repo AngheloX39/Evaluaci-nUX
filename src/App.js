@@ -14,6 +14,7 @@ import DefaultExperience from './pages/DefaultExperience';
 import Home from './pages/Home';
 import CrearRubrica from './pages/CrearRubrica';
 import Rubrica from './pages/Rubrica';
+import EditarRubrica from './pages/EditarRubrica';
 
 // Define las rutas usando createBrowserRouter
 function App() {
@@ -55,6 +56,10 @@ function App() {
         {
           path: "/Rubrica",
           element: <ProtectedRoute><Rubrica /></ProtectedRoute>,
+        },
+        {
+          path: "/EditarRubrica",
+          element: <ProtectedRoute><EditarRubrica /></ProtectedRoute>,
         },
         // Puedes agregar más rutas si es necesario
       ],

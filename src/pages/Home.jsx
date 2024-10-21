@@ -1,125 +1,206 @@
-import React, { useState } from "react";
-import { HiDownload, HiTrash, HiPencil, HiClipboardCheck } from "react-icons/hi"; // Iconos de eliminar, descargar, editar y evaluar
-import MenuSuperior from "../components/MenuSuperior"; // Asegúrate de tener la ruta correcta para importar el menú
+import React, { useState, useEffect } from "react";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { db } from '../firebase'; // Asegúrate de tener la ruta correcta para importar la configuración de Firebase
+import { HiDownload, HiTrash, HiPencil, HiClipboardCheck } from "react-icons/hi";
+import MenuSuperior from "../components/MenuSuperior";
+import { Link, useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { Timestamp } from "firebase/firestore"; // Importa Timestamp
 
 const Home = () => {
-  // Obtener la fecha y hora actuales
-  const createdAt = new Date().toLocaleString(); // Formato de fecha y hora locales
+  const [evaluaciones, setEvaluaciones] = useState([]); // Estado para almacenar las evaluaciones
+  const [eliminacionPendiente, setEliminacionPendiente] = useState(null); // Estado para la evaluación que se va a eliminar
+  const [mensaje, setMensaje] = useState(""); // Estado para los mensajes de notificación
+  const [mostrarNotificacion, setMostrarNotificacion] = useState(false); // Estado para mostrar la notificación
 
-  const [selectedButton, setSelectedButton] = useState(null); // Estado para el botón seleccionado
+  const navigate = useNavigate(); // Inicializa navigate
 
-  const handleDelete = () => {
-    console.log("Eliminar card");
-  };
-
-  const handleEdit = () => {
-    console.log("Editar card");
-  };
-
-  const handleDownload = () => {
-    console.log("Descargar PDF");
-  };
-
-  const handleEvaluate = () => {
-    console.log("Realizar evaluación");
-  };
-
-  const handleEvaluaciones = () => {
-    console.log("Ir a Evaluaciones");
-    setSelectedButton("evaluaciones"); // Marcar "Evaluaciones" como seleccionado
-  };
-
-  const handleCrearRubrica = () => {
-    console.log("Crear nueva rúbrica");
-    setSelectedButton("crearRubrica"); // Marcar "Crear Rúbrica" como seleccionado
-  };
-
-  // Función para obtener el color de fondo y el color de texto del botón
-  const getButtonStyles = (buttonName) => {
-    if (selectedButton === buttonName) {
-      return {
-        backgroundColor: "#b9d5fe", // Color de fondo cuando está seleccionado
-        color: "#275DAC", // Color del texto cuando está seleccionado
-      };
+  // Función para obtener las evaluaciones de Firebase
+  const obtenerEvaluaciones = async () => {
+    try {
+      const evaluacionesSnapshot = await getDocs(collection(db, "EvUser"));
+      const evaluacionesList = evaluacionesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setEvaluaciones(evaluacionesList); // Guardar las evaluaciones en el estado
+    } catch (error) {
+      setMensaje(`Error al cargar evaluaciones: ${error.message}`);
+      setMostrarNotificacion(true);
     }
-    return {
-      backgroundColor: "#275DAC", // Color de fondo por defecto
-      color: "#ffffff", // Color de texto por defecto
-    };
+  };
+
+  useEffect(() => {
+    obtenerEvaluaciones(); // Cargar evaluaciones al montar el componente
+  }, []);
+
+  // Función para confirmar la eliminación de una evaluación
+  const confirmarEliminacion = (evaluacion) => {
+    setEliminacionPendiente(evaluacion); // Establecer la evaluación a eliminar
+  };
+
+  // Función para cancelar la eliminación
+  const cancelarEliminacion = () => {
+    setEliminacionPendiente(null); // Limpiar el estado
+  };
+
+  // Función para eliminar una evaluación de Firebase
+  const handleDelete = async () => {
+    if (!eliminacionPendiente) return;
+
+    try {
+      await deleteDoc(doc(db, "EvUser", eliminacionPendiente.id)); // Eliminar el documento de Firebase
+      setEvaluaciones(prev => prev.filter(evaluacion => evaluacion.id !== eliminacionPendiente.id)); // Actualizar el estado
+      setMensaje(`La evaluación "${eliminacionPendiente.nombreRubrica}" ha sido eliminada correctamente.`);
+    } catch (error) {
+      setMensaje(`Error al eliminar la evaluación: ${error.message}`);
+    } finally {
+      setEliminacionPendiente(null); // Limpiar la evaluación pendiente
+      setMostrarNotificacion(true); // Mostrar la notificación
+    }
+  };
+
+  // Cerrar la notificación después de unos segundos
+  useEffect(() => {
+    if (mostrarNotificacion) {
+      const timer = setTimeout(() => setMostrarNotificacion(false), 3000);
+      return () => clearTimeout(timer); // Limpiar el temporizador
+    }
+  }, [mostrarNotificacion]);
+
+  // Función para navegar a la página de edición
+  const handleEdit = (evaluacion) => {
+    console.log("Navegando a EditarRubrica con:", evaluacion); // Agrega este log
+    navigate("/EditarRubrica", {
+      state: {
+        rubricaId: evaluacion.id,
+        nombreRubrica: evaluacion.nombreRubrica,
+        criteriosSeleccionados: evaluacion.criterios // Asegúrate de enviar los criterios seleccionados
+      }
+    });
+  };
+
+  const handleDownload = (id) => {
+    console.log("Descargar PDF de la evaluación con ID:", id);
+  };
+
+  const handleEvaluate = (id) => {
+    console.log("Realizar evaluación con ID:", id);
   };
 
   return (
     <div>
       <MenuSuperior bgColor="#275dac" textColor="#ffffff" />
 
-      {/* Contenedor de los botones Evaluaciones y Crear Rúbrica */}
       <div className="flex justify-end mt-4 mr-10">
         <button
           className="py-2 px-4 rounded-md mr-4"
-          style={getButtonStyles("evaluaciones")}
-          onClick={handleEvaluaciones}
+          style={{ backgroundColor: "#275DAC", color: "#ffffff" }}
+          onClick={() => console.log("Ir a Evaluaciones")}
         >
           Evaluaciones
         </button>
-        <button
-          className="py-2 px-4 rounded-md"
-          style={getButtonStyles("crearRubrica")}
-          onClick={handleCrearRubrica}
-        >
-          Crear Rúbrica
-        </button>
+        <Link to="/CrearRubrica">
+          <button
+            className="py-2 px-4 rounded-md"
+            style={{ backgroundColor: "#275DAC", color: "#ffffff" }}
+            onClick={() => console.log("Crear nueva rúbrica")}
+          >
+            Crear Rúbrica
+          </button>
+        </Link>
       </div>
 
-      {/* Contenedor de la card alineada a la izquierda y separada del menú */}
-      <div className="flex justify-start mt-4 ml-10">
-        <div className="bg-white shadow-lg rounded-lg w-80 border-2 border-gray-300 overflow-hidden">
-          {/* Nombre de la rúbrica en el medio */}
-          <div className="p-4">
-            <h2 className="text-xl font-bold mb-2 text-[#275DAC] text-center">Nombre de la Rúbrica</h2>
-            {/* Fecha y hora de creación */}
-            <p className="text-gray-500 text-center">{`Creada el: ${createdAt}`}</p>
-          </div>
+      {/* Mostrar las evaluaciones cargadas de Firebase */}
+      <div className="flex flex-wrap justify-start mt-4 ml-10">
+        {evaluaciones.length === 0 ? (
+          <p className="text-gray-500">No hay evaluaciones disponibles.</p>
+        ) : (
+          evaluaciones.map((evaluacion) => (
+            <div key={evaluacion.id} className="bg-white shadow-lg rounded-lg w-80 border-2 border-gray-300 overflow-hidden m-4">
+              <div className="p-4">
+                {/* Nombre de la evaluación */}
+                <h2 className="text-xl font-bold mb-2 text-[#275DAC] text-center">
+                  {evaluacion.nombreRubrica}
+                </h2>
+                {/* Fecha de creación */}
+                <p className="text-gray-500 text-center">
+                  {`Creada el: ${evaluacion.timestamp
+                    ? (evaluacion.timestamp instanceof Timestamp
+                      ? evaluacion.timestamp.toDate().toLocaleDateString()
+                      : evaluacion.timestamp)
+                    : "Fecha no disponible"
+                  }`}
+                </p>
+              </div>
 
-          {/* Botones en una fila en la parte inferior */}
-          <div className="flex">
-            {/* Botón Eliminar (Rojo) */}
-            <button
-              className="flex flex-col items-center justify-center w-1/4 bg-[#FF3E3E] text-white py-3"
-              onClick={handleDelete}
-            >
-              <HiTrash className="text-lg" />
-              <span className="text-xs">Eliminar</span>
-            </button>
+              <div className="flex">
+                <button
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#FF3E3E] text-white py-3"
+                  onClick={() => confirmarEliminacion(evaluacion)}
+                >
+                  <HiTrash className="text-lg" />
+                  <span className="text-xs">Eliminar</span>
+                </button>
 
-            {/* Botón Editar (Azul) */}
-            <button
-              className="flex flex-col items-center justify-center w-1/4 bg-[#275DAC] text-white py-3"
-              onClick={handleEdit}
-            >
-              <HiPencil className="text-lg" />
-              <span className="text-xs">Editar</span>
-            </button>
+                <button
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#275DAC] text-white py-3"
+                  onClick={() => handleEdit(evaluacion)} // Modificado para llamar a handleEdit
+                >
+                  <HiPencil className="text-lg" />
+                  <span className="text-xs">Editar</span>
+                </button>
 
-            {/* Botón Descargar PDF (Verde) */}
-            <button
-              className="flex flex-col items-center justify-center w-1/4 bg-[#2DCA8C] text-white py-3"
-              onClick={handleDownload}
-            >
-              <HiDownload className="text-lg" />
-              <span className="text-xs">Descargar</span>
-            </button>
+                <button
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#2DCA8C] text-white py-3"
+                  onClick={() => handleDownload(evaluacion.id)}
+                >
+                  <HiDownload className="text-lg" />
+                  <span className="text-xs">Descargar</span>
+                </button>
 
-            {/* Botón Evaluar (Amarillo) */}
-            <button
-              className="flex flex-col items-center justify-center w-1/4 bg-[#FBB13C] text-white py-3"
-              onClick={handleEvaluate}
-            >
-              <HiClipboardCheck className="text-lg" />
-              <span className="text-xs">Evaluar</span>
-            </button>
+                <button
+                  className="flex flex-col items-center justify-center w-1/4 bg-[#FBB13C] text-white py-3"
+                  onClick={() => handleEvaluate(evaluacion.id)}
+                >
+                  <HiClipboardCheck className="text-lg" />
+                  <span className="text-xs">Evaluar</span>
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Modal de Confirmación de Eliminación */}
+      {eliminacionPendiente && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">¿Estás seguro de que deseas eliminar esta evaluación?</h2>
+            <p>{eliminacionPendiente.nombreRubrica}</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded-md mr-2"
+                onClick={cancelarEliminacion}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded-md"
+                onClick={handleDelete}
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Notificación */}
+      {mostrarNotificacion && (
+        <div className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-lg shadow-lg">
+          {mensaje}
+        </div>
+      )}
     </div>
   );
 };

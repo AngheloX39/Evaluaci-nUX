@@ -23,7 +23,7 @@ function Login() {
       const user = userCredential.user;
 
       console.log('Usuario ha iniciado sesión con éxito:', user.uid);
-      navigate('/DefaultExperience');
+      navigate('/Home');
     } catch (error) {
       console.error('Error al iniciar sesión:', error.message);
       setErrorMessage('Error al iniciar sesión. Verifica tus credenciales.');

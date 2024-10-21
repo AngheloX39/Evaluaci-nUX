@@ -1,35 +1,49 @@
 import React, { useState } from "react";
-import MenuSuperior2 from "../components/MenuSuperior2"; // Asegúrate de tener la ruta correcta para importar el menú
+import MenuSuperior2 from "../components/MenuSuperior2"; 
+import { useNavigate } from 'react-router-dom';
 
 const CrearRubrica = () => {
-  const [nombreRubrica, setNombreRubrica] = useState(""); // Estado para el nombre de la rúbrica
-  const [criteriosSeleccionados, setCriteriosSeleccionados] = useState([]); // Estado para los criterios seleccionados
+  const [nombreRubrica, setNombreRubrica] = useState(""); 
+  const [criteriosSeleccionados, setCriteriosSeleccionados] = useState([]); 
+  const navigate = useNavigate();
 
-  // Nuevos criterios
   const criterios = [
     "Usabilidad",
     "Simplicidad",
     "Accesibilidad",
-    "Constancia",
+    "Consistencia",
     "Centrado en el Usuario",
   ];
 
-  // Manejar la selección de criterios
   const handleCheckboxChange = (criterio) => {
     if (criteriosSeleccionados.includes(criterio)) {
-      setCriteriosSeleccionados(criteriosSeleccionados.filter(c => c !== criterio)); // Desmarcar el criterio
+      setCriteriosSeleccionados(criteriosSeleccionados.filter(c => c !== criterio)); 
     } else {
-      setCriteriosSeleccionados([...criteriosSeleccionados, criterio]); // Marcar el criterio
+      setCriteriosSeleccionados([...criteriosSeleccionados, criterio]);
     }
+  };
+
+  const handleNext = () => {
+    if (nombreRubrica.trim() === "") {
+      alert("Por favor, ingresa un nombre para la rúbrica.");
+      return;
+    }
+
+    if (criteriosSeleccionados.length === 0) {
+      alert("Por favor, selecciona al menos una categoría.");
+      return;
+    }
+
+    // Navegar a la página Rubrica pasando el estado
+    navigate('/Rubrica', { state: { nombreRubrica, criteriosSeleccionados } });
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <MenuSuperior2 bgColor="white" textColor="#275dac" />
 
-      {/* Ajuste de contenedor para eliminar la barra de desplazamiento */}
       <div className="flex-grow flex justify-center items-center bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 overflow-hidden">
-        <div className="max-w-4xl w-full py-6 px-6 bg-white rounded-lg shadow-lg"> {/* Ajustamos el padding */}
+        <div className="max-w-4xl w-full py-6 px-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-xl font-bold text-[#275DAC] mb-2">Nombre de la Rúbrica</h2>
           <input
             type="text"
@@ -60,16 +74,15 @@ const CrearRubrica = () => {
 
           <hr className="border-t-4 border-[#275dac] my-3" />
 
-          <div className="flex justify-between mt-4"> {/* Margen superior de los botones */}
+          <div className="flex justify-between mt-4">
             <button
-              onClick={() => console.log("Volver al inicio")}
+              onClick={() => navigate("/")}
               className="bg-[#275dac] text-white py-2 px-8 rounded-lg shadow transition duration-200 hover:bg-[#b3cef5] hover:text-[#275DAC] focus:outline-none focus:ring-0"
             >
               Inicio
             </button>
-
             <button
-              onClick={() => console.log("Crear nueva rúbrica")}
+              onClick={handleNext}
               className="bg-[#275dac] text-white py-2 px-8 rounded-lg shadow transition duration-200 hover:bg-[#b3cef5] hover:text-[#275DAC] focus:outline-none focus:ring-0"
             >
               Siguiente
