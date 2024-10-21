@@ -10,21 +10,18 @@ const Rubrica = () => {
   const { nombreRubrica, criteriosSeleccionados } = location.state || {};
   const navigate = useNavigate();
 
-  // Estado para los criterios por categoría
   const [criteriosPorCategoria, setCriteriosPorCategoria] = useState({});
 
-  // Efecto para inicializar los criterios desde la información recibida
   useEffect(() => {
     if (criteriosSeleccionados && Array.isArray(criteriosSeleccionados)) {
       const initialCriterios = criteriosSeleccionados.reduce((acc, categoria) => {
-        acc[categoria] = []; // Asegúrate de que esto se ajuste a la estructura correcta
+        acc[categoria] = [];
         return acc;
       }, {});
       setCriteriosPorCategoria(initialCriterios);
     }
   }, [criteriosSeleccionados]);
 
-  // Función para agregar un nuevo criterio
   const agregarCriterio = (categoria) => {
     const nuevoCriterio = prompt(`Introduce un nombre para el nuevo criterio en la categoría ${categoria}:`);
     if (nuevoCriterio) {
@@ -35,7 +32,6 @@ const Rubrica = () => {
     }
   };
 
-  // Función para agregar una pregunta a un criterio
   const agregarPregunta = (categoria, criterioIndex) => {
     const input = document.getElementById(`input-${categoria}-${criterioIndex}`);
     const nuevaPregunta = input.value.trim();
@@ -45,19 +41,17 @@ const Rubrica = () => {
         const criteriosActualizados = [...prev[categoria]];
         const nuevaPreguntaConID = { id: Date.now(), texto: nuevaPregunta };
 
-        // Evitar preguntas duplicadas
         if (!criteriosActualizados[criterioIndex].preguntas.some(preg => preg.texto === nuevaPregunta)) {
           criteriosActualizados[criterioIndex].preguntas.push(nuevaPreguntaConID);
         }
         return { ...prev, [categoria]: criteriosActualizados };
       });
-      input.value = ''; // Limpiar el input
+      input.value = '';
     } else {
       alert('Por favor, ingrese una pregunta válida.');
     }
   };
 
-  // Función para eliminar una pregunta específica dentro de un criterio
   const eliminarPregunta = (categoria, criterioIndex, preguntaId) => {
     setCriteriosPorCategoria((prev) => {
       const criteriosActualizados = [...prev[categoria]];
@@ -69,7 +63,6 @@ const Rubrica = () => {
     });
   };
 
-  // Función para eliminar un criterio completo
   const eliminarCriterio = (categoria, criterioIndex) => {
     setCriteriosPorCategoria((prev) => {
       const criteriosActualizados = [...prev[categoria]];
@@ -78,31 +71,27 @@ const Rubrica = () => {
     });
   };
 
-  // Función para guardar la rúbrica y criterios en Firebase
   const handleGuardar = async () => {
     try {
       const rubricaRef = collection(db, "EvUser");
       const criterioRef = collection(db, "criterio");
 
-      // Guardar criterios en la colección 'criterio' y mantener un array de ids
       const criteriosIds = [];
 
       for (const [categoria, criterios] of Object.entries(criteriosPorCategoria)) {
         for (const criterio of criterios) {
-          // Guardar cada criterio con su categoría y preguntas
           const docRef = await addDoc(criterioRef, {
             nombre: criterio.nombre,
             preguntas: criterio.preguntas,
-            categoria: categoria,  // Guardar la categoría asociada al criterio
+            categoria: categoria,
             timestamp: new Date(),
           });
-          criteriosIds.push(docRef.id); // Guarda el ID del nuevo criterio
+          criteriosIds.push(docRef.id);
         }
       }
 
-      // Ahora guarda la rúbrica con referencias a los IDs de criterios
       await addDoc(rubricaRef, {
-        criterios: criteriosIds, // Guarda las referencias a los criterios
+        criterios: criteriosIds,
         nombreRubrica: nombreRubrica,
         timestamp: new Date(),
       });
@@ -116,10 +105,10 @@ const Rubrica = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500"
-    style={{
-      backgroundSize: '200% 200%',
-      animation: 'moveBackground 10s ease infinite',
-    }}
+      style={{
+        backgroundSize: '200% 200%',
+        animation: 'moveBackground 10s ease infinite',
+      }}
     >
       <MenuSuperior bgColor="white" textColor="#275dac" />
 
@@ -129,20 +118,19 @@ const Rubrica = () => {
             <div className="bg-[#275dac] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl">
               2
             </div>
-            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">TERMINA DE CREAR TU RÚBRICA</h2>
+            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">TERMINA DE CREAR TU RÚBRICA :</h2>
             <h2 className="ml-4 text-[#275dac] font-bold text-2xl">
-              Elige las preguntas de ayuda para la rúbrica: {nombreRubrica}
+              {nombreRubrica}
             </h2>
           </div>
 
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
-          {/* Tabla para mostrar criterios y preguntas */}
           <table className="min-w-full table-auto border-collapse rounded-lg mx-0 mb-4">
             <thead>
               <tr className="bg-[#275dac] rounded-t-lg">
-                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white">CATEGORÍA</th>
                 <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white">CRITERIOS</th>
+                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white">CATEGORÍA</th>
                 <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white">PREGUNTAS</th>
               </tr>
             </thead>
@@ -151,28 +139,25 @@ const Rubrica = () => {
                 criterios.length === 0 ? (
                   <tr key={categoria}>
                     <td className="border-2 border-[#275dac] px-4 py-2">{categoria}</td>
-                    <td className="border-2 border-[#275dac] px-4 py-2" colSpan="2">No hay criterios añadidos.</td>
+                    <td className="border-2 border-[#275dac] px-4 py-2" colSpan="2">Añade las categorias</td>
                   </tr>
                 ) : (
                   criterios.map((criterio, criterioIndex) => (
                     <tr key={criterioIndex}>
-                      {/* Mostrar categoría solo en la primera fila del grupo */}
                       {criterioIndex === 0 && (
                         <td rowSpan={criterios.length} className="border-2 border-[#275dac] px-4 py-2">
                           {categoria}
                         </td>
                       )}
-                      {/* Mostrar el criterio */}
                       <td className="border-2 border-[#275dac] px-4 py-2">
                         {criterio.nombre}
                         <button
                           className="ml-2 text-red-600"
                           onClick={() => eliminarCriterio(categoria, criterioIndex)}
                         >
-                          <FaTrashAlt /> {/* Ícono de eliminar criterio */}
+                          <FaTrashAlt />
                         </button>
                       </td>
-                      {/* Mostrar preguntas del criterio */}
                       <td className="border-2 border-[#275dac] px-4 py-2">
                         {criterio.preguntas.length === 0
                           ? "No hay preguntas aún."
@@ -183,11 +168,10 @@ const Rubrica = () => {
                                 className="text-red-600"
                                 onClick={() => eliminarPregunta(categoria, criterioIndex, pregunta.id)}
                               >
-                                <FaTrashAlt /> {/* Ícono de eliminar pregunta */}
+                                <FaTrashAlt />
                               </button>
                             </div>
                           ))}
-                        {/* Input para agregar nueva pregunta */}
                         <div className="flex items-center mt-2">
                           <input
                             type="text"
@@ -210,56 +194,53 @@ const Rubrica = () => {
             </tbody>
           </table>
 
-          {/* Botón para agregar criterios */}
-          <div className="flex justify-center mt-4">
+          {/* Mensaje y botones justo encima de los botones de criterios */}
+          <h3 className="text-center text-[#275dac] font-bold text-lg mb-4">SELECCIONA EL CRITERIO DONDE QUIERAS AGREGAR LA CATEGORÍA</h3>
+
+          <div className="flex justify-center space-x-4 mt-4">
             {Object.keys(criteriosPorCategoria).map((categoria, index) => (
               <button
                 key={index}
-                className="mt-4 bg-green-500 text-white p-2 rounded mx-2"
+                className="w-40 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+                style={{
+                  border: "none",
+                  boxShadow: "none",
+                }}
                 onClick={() => agregarCriterio(categoria)}
               >
-                + Añadir Criterio en {categoria}
+                {categoria}
               </button>
             ))}
           </div>
 
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
-          {/* Botones de navegación */}
           <div className="flex justify-between mt-8">
             <button
-              className="bg-[#275dac] text-white py-2 px-8 rounded-lg shadow hover:bg-[#b3cef5] transition duration-200 focus:outline-none"
-              onClick={() => navigate("/CrearRubrica")}
+              className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+              style={{
+                border: "none",
+                boxShadow: "none",
+              }}
+              onClick={() => navigate(-1)}
             >
-              Atrás
+              Volver
             </button>
 
             <button
-              className="bg-[#275dac] text-white py-2 px-8 rounded-lg shadow hover:bg-[#b3cef5] transition duration-200 focus:outline-none"
+              className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+              style={{
+                border: "none",
+                boxShadow: "none",
+              }}
               onClick={handleGuardar}
             >
-              Guardar
+              Guardar rúbrica
             </button>
           </div>
         </div>
       </div>
-     {/* Animación del fondo */}
-     <style>{`
-        @keyframes moveBackground {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-      `}</style>
     </div>
-
-    
   );
 };
 

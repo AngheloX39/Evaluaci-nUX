@@ -16,11 +16,14 @@ const MenuSuperior = ({ bgColor, textColor }) => {
       style={{ backgroundColor: bgColor, color: textColor }}
     >
       <div className="text-2xl font-bold">
-        <Link to="/Home">
-        UXGrade
+        <Link
+          to="/Home"
+          className="text-[#275dac] no-underline" // Usar clases de Tailwind para el color y quitar la línea
+        >
+          UXGrade
         </Link>
-        
       </div>
+
       <div className="relative flex items-center">
         {/* Botón de cerrar sesión más compacto */}
         <button

@@ -24,25 +24,20 @@ const CrearRubrica = () => {
   };
 
   const handleNext = () => {
-    if (nombreRubrica.trim() === "") {
-      alert("Por favor, ingresa un nombre para la rúbrica.");
+    if (nombreRubrica.trim() === "" || criteriosSeleccionados.length === 0) {
       return;
     }
 
-    if (criteriosSeleccionados.length === 0) {
-      alert("Por favor, selecciona al menos una categoría.");
-      return;
-    }
-
-    // Navegar a la página Rubrica pasando el estado
     navigate('/Rubrica', { state: { nombreRubrica, criteriosSeleccionados } });
   };
+
+  // Definir si el botón debe estar deshabilitado
+  const isNextDisabled = nombreRubrica.trim() === "" || criteriosSeleccionados.length === 0;
 
   return (
     <div className="min-h-screen flex flex-col">
       <MenuSuperior2 bgColor="white" textColor="#275dac" />
 
-      {/* Contenedor principal con fondo degradado y movimiento */}
       <div
         className="flex-grow flex justify-center items-center bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500"
         style={{
@@ -50,7 +45,7 @@ const CrearRubrica = () => {
           animation: 'moveBackground 10s ease infinite',
         }}
       >
-        <div className="max-w-4xl w-full py-6 px-6 bg-white rounded-lg shadow-lg"> {/* Ajustamos el padding */}
+        <div className="max-w-4xl w-full py-6 px-6 bg-white rounded-lg shadow-lg">
           <div className="flex items-center justify-start mb-4">
             <div className="bg-[#275dac] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl">
               1
@@ -58,7 +53,6 @@ const CrearRubrica = () => {
             <h2 className="ml-4 text-[#275dac] font-bold text-2xl">DALE UN NOMBRE Y SELECCIONA LOS CRITERIOS</h2>
           </div>
 
-          {/* Reemplazar <hr> con un div para efecto de degradado */}
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-4 mb-8"></div>
           <h2 className="text-xl font-bold text-[#275DAC] mb-2">Nombre de la Rúbrica</h2>
           <input
@@ -69,7 +63,6 @@ const CrearRubrica = () => {
             placeholder="Ingresa el nombre de la rúbrica"
           />
 
-          {/* Otro div para la línea */}
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-2" />
 
           <h2 className="text-xl font-bold text-[#275DAC] mb-2">Selecciona los Criterios</h2>
@@ -89,27 +82,31 @@ const CrearRubrica = () => {
             ))}
           </div>
 
-          {/* Último div para la línea */}
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
           <div className="flex justify-between mt-4">
             <button
               onClick={() => navigate("/")}
-              className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500" // Efecto degradado en hover
+              className="w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
               style={{
-                border: "none", // Remove any borders
-                boxShadow: "none" // Remove any shadow
-                }}
-           >
+                border: "none",
+                boxShadow: "none",
+              }}
+            >
               Inicio
             </button>
             <button
               onClick={handleNext}
-              className={`w-1/4 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500 `} // Efecto degradado en hover
+              disabled={isNextDisabled}
+              className={`w-1/4 py-2 rounded-md text-lg transition-all duration-300 ${
+                isNextDisabled
+                  ? "bg-gray-400 cursor-not-allowed text-white"
+                  : "bg-[#275DAC] text-white hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+              }`}
               style={{
-                border: "none", // Remove any borders
-                boxShadow: "none" // Remove any shadow
-                }}
+                border: "none",
+                boxShadow: "none",
+              }}
             >
               Siguiente
             </button>
@@ -117,7 +114,6 @@ const CrearRubrica = () => {
         </div>
       </div>
 
-      {/* Animación del fondo */}
       <style>{`
         @keyframes moveBackground {
           0% {
