@@ -176,7 +176,8 @@ const EditarRubrica = () => {
           <h2 className="text-[#275dac] font-bold text-2xl mb-4">
             Editando Rúbrica: {rubrica.nombreRubrica}
           </h2>
-          <hr className="border-t-4 border-[#275dac] my-4 mb-8" />
+
+          <div className="h-1 bg-gradient-to-r mb-4 from-blue-800 via-blue-500 to-teal-500 my-2" />
 
           {/* Tabla para mostrar criterios y preguntas */}
           <table className="min-w-full table-auto border-collapse rounded-lg mx-0 mb-4">
@@ -206,7 +207,7 @@ const EditarRubrica = () => {
                           <div key={pregunta.id} className="flex justify-between items-center">
                             - {pregunta.texto}
                             <button
-                              className="text-red-600"
+                              className="text-red-600 bg-[#ffffff]"
                               onClick={() => eliminarPregunta(categoria, criterioIndex, pregunta.id)}
                             >
                               <FaTrashAlt /> {/* Ícono de eliminar pregunta */}
@@ -235,6 +236,8 @@ const EditarRubrica = () => {
               ))}
             </tbody>
           </table>
+
+          <div className="h-1 bg-gradient-to-r mt-4 from-blue-800 via-blue-500 to-teal-500 my-2" />
 
           {/* Botones de navegación */}
           <div className="flex justify-between mt-8">

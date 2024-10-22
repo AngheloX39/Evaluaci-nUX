@@ -113,6 +113,8 @@ const Rubrica = () => {
     }
   };
 
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500"
       style={{
@@ -225,27 +227,26 @@ const Rubrica = () => {
 
           {/* Muestra el input para nueva categoría */}
           {categoriaActual && (
-  <div className="flex justify-between mb-4 pt-4 w-1/3 mx-auto"> {/* Reduce el ancho y centra el contenedor */}
-    <input
-      type="text"
-      value={nuevaCategoria}
-      onChange={(e) => setNuevaCategoria(e.target.value)}
-      placeholder="Añadir nueva categoría..."
-      className="p-2 border rounded w-full mr-2" // Añadir margen a la derecha del input
-    />
-    <button
-      className="w-20 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
-      style={{
-        border: "none",
-        boxShadow: "none",
-      }}
-      onClick={handleAgregarNuevaCategoria}
-    >
-      +
-    </button>
-  </div>
-)}
-
+            <div className="flex justify-between mb-4 pt-4 w-1/3 mx-auto"> {/* Reduce el ancho y centra el contenedor */}
+              <input
+                type="text"
+                value={nuevaCategoria}
+                onChange={(e) => setNuevaCategoria(e.target.value)}
+                placeholder="Añadir nueva categoría..."
+                className="p-2 border rounded w-full mr-2" // Añadir margen a la derecha del input
+              />
+              <button
+                className="w-20 py-2 rounded-md text-lg bg-[#275DAC] text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:via-blue-500 hover:to-teal-500"
+                style={{
+                  border: "none",
+                  boxShadow: "none",
+                }}
+                onClick={handleAgregarNuevaCategoria}
+              >
+                +
+              </button>
+            </div>
+          )}
 
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-3" />
 
@@ -271,6 +272,11 @@ const Rubrica = () => {
             >
               Guardar rúbrica
             </button>
+          </div>
+
+          {/* Botón de Siguiente */}
+          <div className="flex justify-center mt-4">
+          
           </div>
         </div>
       </div>

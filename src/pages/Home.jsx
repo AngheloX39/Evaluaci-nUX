@@ -137,30 +137,30 @@ const Home = () => {
               </div>
 
               <div className="flex">
-                <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#FF3E3E] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-400"
-                  onClick={() => confirmarEliminacion(evaluacion)}
-                >
-                  <HiTrash className="text-lg" />
-                  <span className="text-xs">Eliminar</span>
-                </button>
+  <button
+    className="flex flex-col items-center justify-center w-1/3 bg-[#FF3E3E] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-400"
+    onClick={() => confirmarEliminacion(evaluacion)}
+  >
+    <HiTrash className="text-lg" />
+    <span className="text-xs">Eliminar</span>
+  </button>
 
-                <button
-                  className="flex flex-col items-center justify-center w-1/4 bg-[#275DAC] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:to-blue-500"
-                  onClick={() => handleEdit(evaluacion)}
-                >
-                  <HiPencil className="text-lg" />
-                  <span className="text-xs">Editar</span>
-                </button>
+  <button
+    className="flex flex-col items-center justify-center w-1/3 bg-[#275DAC] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-800 hover:to-blue-500"
+    onClick={() => handleEdit(evaluacion)}
+  >
+    <HiPencil className="text-lg" />
+    <span className="text-xs">Editar</span>
+  </button>
 
-                <button
-                  className="flex flex-col items-center justify-center w-1/2 bg-[#60ee3d] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-green-200 hover:to-green-400"
-                  onClick={() => handleEvaluate(evaluacion)} // Mantiene la funcionalidad de Evaluar
-                >
-                  <HiClipboardCheck className="text-lg" />
-                  <span className="text-xs">Visualizar</span> {/* Cambiado a "Ver" */}
-                </button>
-              </div>
+  <button
+    className="flex flex-col items-center justify-center w-1/3 bg-[#60ee3d] text-white py-3 transition-all duration-300 hover:bg-gradient-to-r hover:from-green-200 hover:to-green-400"
+    onClick={() => handleEvaluate(evaluacion)} // Mantiene la funcionalidad de Evaluar
+  >
+    <HiClipboardCheck className="text-lg" />
+    <span className="text-xs">Visualizar</span>
+  </button>
+</div>
             </div>
           ))
         )}
