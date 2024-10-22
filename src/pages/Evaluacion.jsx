@@ -174,7 +174,7 @@ const Evaluacion = () => {
   
     Promise.all([
       html2canvas(input, { scale: 6 }), // Escalar para mejorar la resolución
-      inputPuntuacion ? html2canvas(inputPuntuacion, { scale: 2 }) : Promise.resolve(null) // Manejar la sección de puntuación si no existe
+      inputPuntuacion ? html2canvas(inputPuntuacion, { scale: 6 }) : Promise.resolve(null) // Manejar la sección de puntuación si no existe
     ]).then(([canvasTabla, canvasPuntuacion]) => {
       const imgDataTabla = canvasTabla.toDataURL("image/png");
   
@@ -197,7 +197,7 @@ const Evaluacion = () => {
       // Añadir la sección de puntuación si existe
       if (canvasPuntuacion) {
         const imgDataPuntuacion = canvasPuntuacion.toDataURL("image/png");
-        const imgWidthP = 60; // Ancho de la sección de puntuación
+        const imgWidthP = 200; // Ancho de la sección de puntuación
         const imgHeightPuntuacion = (canvasPuntuacion.height * imgWidthP) / canvasPuntuacion.width; // Mantener proporción
   
         // Centrar la sección de puntuación
