@@ -50,11 +50,11 @@ const CrearRubrica = () => {
             <div className="bg-[#275dac] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl">
               1
             </div>
-            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">DALE UN NOMBRE Y SELECCIONA LOS CRITERIOS</h2>
+            <h2 className="ml-4 text-[#275dac] font-bold text-2xl">DALE UN NOMBRE Y SELECCIONA LOS PRINCIPIOS</h2>
           </div>
 
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-4 mb-8"></div>
-          <h2 className="text-xl font-bold text-[#275DAC] mb-2">Nombre de la Rúbrica</h2>
+          <h2 className="text-xl font-bold text-[#275DAC] mb-2">Nombre de la rúbrica</h2>
           <input
             type="text"
             value={nombreRubrica}
@@ -65,7 +65,7 @@ const CrearRubrica = () => {
 
           <div className="h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-teal-500 my-2" />
 
-          <h2 className="text-xl font-bold text-[#275DAC] mb-2">Selecciona los Criterios</h2>
+          <h2 className="text-xl font-bold text-[#275DAC] mb-2">Selecciona los rincipios que deseas incluir</h2>
           <div className="flex flex-col space-y-4">
             {criterios.map((criterio) => (
               <label key={criterio} className="flex items-center space-x-2">

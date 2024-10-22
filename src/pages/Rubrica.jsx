@@ -141,17 +141,17 @@ const Rubrica = () => {
           <table className="min-w-full table-auto border-collapse rounded-lg mx-0 mb-4">
             <thead>
               <tr className="bg-[#275dac] rounded-t-lg">
-                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white">CRITERIOS</th>
-                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white">CATEGORÍA</th>
-                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white">PREGUNTAS</th>
+                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white text-center">PRINCIPIOS</th>
+                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white text-center">CRITERIOS</th>
+                <th className="border-2 border-[#275dac] px-4 py-2 text-left text-white text-center">PREGUNTAS</th>
               </tr>
             </thead>
             <tbody>
               {Object.entries(criteriosPorCategoria).map(([categoria, criterios]) => (
                 criterios.length === 0 ? (
                   <tr key={categoria}>
-                    <td className="border-2 border-[#275dac] px-4 py-2">{categoria}</td>
-                    <td className="border-2 border-[#275dac] px-4 py-2" colSpan="2">Añade las categorias</td>
+                    <td className="border-2 border-[#275dac] px-4 py-2 text-center">{categoria}</td>
+                    <td className="border-2 border-[#275dac] px-4 py-2 text-center" colSpan="2">Añade los criterios</td>
                   </tr>
                 ) : (
                   criterios.map((criterio, criterioIndex) => (
@@ -174,8 +174,8 @@ const Rubrica = () => {
                         {criterio.preguntas.length === 0
                           ? "No hay preguntas aún."
                           : criterio.preguntas.map((pregunta) => (
-                            <div key={pregunta.id} className="ml-4 flex justify-between items-center">
-                              - {pregunta.texto}
+                            <div key={pregunta.id} className="ml-4 flex justify-between items-center text-center">
+                               {pregunta.texto}
                               <button
                                 className="text-red-600 bg-white"
                                 onClick={() => eliminarPregunta(categoria, criterioIndex, pregunta.id)}
@@ -207,7 +207,7 @@ const Rubrica = () => {
             </tbody>
           </table>
 
-          <h3 className="text-center text-[#275dac] font-bold text-lg mb-4">SELECCIONA EL CRITERIO DONDE QUIERAS AGREGAR LA CATEGORÍA</h3>
+          <h3 className="text-center text-[#275dac] font-bold text-lg mb-4">SELECCIONA EL PRINCIPIO DONDE QUIERAS AGREGAR EL CRITERIO</h3>
 
           <div className="flex justify-center space-x-4 mt-4">
             {Object.keys(criteriosPorCategoria).map((categoria, index) => (
